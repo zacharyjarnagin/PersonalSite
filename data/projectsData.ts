@@ -1,19 +1,15 @@
 const projectsData = [
   {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
+    title: 'Tadpole Tutoring',
+    description: `Worked as a full-stack developer to create a website that allows students to find tutors and schedule sessions.`,
+    imgSrc: '/static/images/tadpole.png',
+    href: 'https://www.tadpoletutoring.org/',
   },
   {
-    title: 'The Time Machine',
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten headphones with this simple yet affordable solution.`,
-    imgSrc: '/static/images/time-machine.jpg',
-    href: '/blog/the-time-machine',
+    title: 'Highbeams',
+    description: `Wrote a song with a band and played guitar. Recorded in a home studio where we mixed and mastered the track.`,
+    imgSrc: '/static/images/BackseatExperience.jpg',
+    href: 'https://open.spotify.com/artist/2e6rBejQPMCcdfE4V3AnBK',
   },
 ]
 
