@@ -1,0 +1,95 @@
+---
+title: 'Microservices'
+date: 2023-11-07T15:32:14Z
+lastmod: '2023-11-07'
+tags: ['Energysage', 'Microservices']
+draft: false
+summary: 'How I have fallen in love with Microservices'
+bibliography: microservices.bib
+---
+
+
+At my current role as a Software Engineer at [Energysage](www.energysage.com), we are in the midst of moving away from our monolith codebases to Microservices. I thought I would share my experience so far!
+
+# What is a Microservice?
+> Microservices are independently deployable services modeled around a business domain
+
+[@mono-to-micro]
+
+Essentially, these are small services that are exposed to one another typically via API endpoints and encapsulate a small portion of the business domain.
+
+<Image alt="Example Microservice" src="/static/images/microservices/example-microservice.png" width={1024} height={1024} />
+
+
+For example, in a social media app there may be a service that handles only posts and another that handles likes of posts. The posts microservice handles creation, reading, updating, and deleting (CRUD) of these posts while the likes microservice handles CRUD for likes.
+When a user views a post, there may be an additional call to the likes microservice to obtain the appropriate information.
+
+But why do this at all?
+
+# What are the benefits?
+
+Although the upfront cost (development time and perhaps actual cost) for migrating to microservices may seem intimidating, they pay for themselves in the long run.
+
+## Maintainability
+
+Breaking apart code into seperate repositories and infrastructure based on business domains allows for better developer maintainability.
+
+When working in a respository that is laser focused on one aspect of the business domain, there is less context switching and less wading through irrelevant files.
+Additionally, when a service goes down (say someone pushes breaking code), your application is (ideally) only broken with this one service. This keeps your applications uptime high and **limits the scope of failure**.
+To fix this issue, you can have the team responsible for this broken microservice roll back the change, limiting downtime!
+
+## Experimentation
+
+Since all of your services are isolated from one another, experimentation becomes easier.
+
+You are now able to run CI/CD on smaller code bases, drastically reducing deploy times. Additionally, you can push experiments without worrying about their failures taking down the rest of the site.
+
+## Single Source of Truth
+
+A good habbit is to make sure each service is responsible for all data related to the business domain. If you need that data, reach out to that service. Because of this, you can rest easy knowing there is a single source of truth for whatever you are after.
+
+## Potential Cost Savings
+
+Microservices are typically spun up with a serverless framework on Amazon Web Services or Google Cloud Platform. This leads to compute power only existing when you need it, reducing idle time and reducing costs!
+
+# What are the challenges?
+
+Microservice adoption does come with it's own challenges.
+
+## Communication - Technical
+
+Now that your services cannot just be imported into a file and have to be invoked via an API call or event, there is additional overhead that comes with this.
+
+You need to test these invokations and ensure that you handle mal-formed requests should they ever arrise. Implementing logic to handle failure states is non-trivial.
+
+## Communication - Non-Technical
+
+As we move from engineering teams centered around monoliths to company wide microservices, ensuring proper communuication amongst teams is key.
+
+Teams now have to communicate to one another their invokations (via things like API contracts) and announce breaking changes. There also needs to be investment from product up front to consider where the lines of the business domain begin and end for a microservice.
+
+# Where are you now?
+
+We have spent the past few months planning this migration and are now in the execution phase!
+
+## Strangler Fig
+
+> ...the old and the new can coexist, giving the new system time to grow and potentially entirely replace the old system. 
+
+[@mono-to-micro]
+
+This pattern of adoption essentially is to do the following:
+
+1. Identify a business domain that the monolith handles
+2. Create a microservice that handles that business domain
+3. Redirect the call from monolith to microservice
+
+This ensures that if the microservice starts failing, you can redirect calls back to the monolith. Rinse and repeat these steps until the monolith is replaced by your microservices!
+
+## Communication
+
+We are currently attempting to figure out the best solution to communicate ownership, changes, and capabilities amongst the dev team. The current frontrunner is [backstage.io](https://backstage.io/), but we are yet to adopt it!
+
+**References:**
+
+[^ref]
