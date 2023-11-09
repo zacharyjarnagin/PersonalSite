@@ -6,7 +6,7 @@ const siteMetadata = {
   description: 'My internal monologue gone external. Everything from tech to music to coffee!',
   language: 'en-us',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://www.zjarnagin.app',
+  siteUrl: 'https://www.zjarnagin.com',
   siteRepo: 'https://github.com/zacharyjarnagin/PersonalSite',
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/og-card.png',
