@@ -64,6 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${space_grotesk.variable} scroll-smooth`}
       suppressHydrationWarning
     >
+      <link rel="icon" href="/static/favicons/favicon.ico" />
       <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />
       <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/favicon-32x32.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png" />
@@ -73,6 +74,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="Zachary Jarnagin" />
+      <meta property="og:description" content="Fullstack Software Engineer II @ Energysage" />
+      <meta property="og:url" content="https://www.zjarnagin.com/" />
+      <meta property="og:image" content="/static/images/twitter-card.png" />
       <body className="bg-white text-black antialiased dark:bg-gray-950 dark:text-white">
         <ThemeProviders>
           <Analytics />
