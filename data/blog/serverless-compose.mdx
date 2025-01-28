@@ -1,0 +1,158 @@
+---
+title: 'Using Serverless Framework Compose to Orchestrate Your Microservices'
+date: 2025-01-17T15:32:14Z
+lastmod: '2023-11-06'
+tags: ['ShowNxt', 'Serverless Framework']
+authors: ['default']
+draft: false
+summary: 'How to use Serverless Compose to orchestrate microservices'
+images: ['/static/images/serverless-compose/serverless-compose.png']
+---
+
+This is a cross post from [the ShowNxt developer blog](https://www.shownxt.com/posts/serverless-compose)!
+
+## Intro
+
+<Image
+  alt="Serverless Compose Overview"
+  src="/static/images/serverless-compose/serverless-compose.png"
+  width={1024}
+  height={1024}
+/>
+
+For a Serverless Framework monorepository with multiple microservices, `Compose` is a vital tool to orchestrate deployments. With a few short steps, you can deploy multiple services with one command and pipe outputs from one service to another via parameters.
+
+## Set Up
+
+Getting started is very straight forward. In the root of your project, add a `serverless-compose.yaml` file
+
+```filepath
+project/
+  ├── serverless-compose.yaml
+  ├── ...
+  ├── auth/
+  │   ├── serverless.yaml
+  │   └── ...
+  ├── accounts/
+  │   ├── serverless.yaml
+  │   └── ...
+  └── posts/
+      ├── serverless.yaml
+      └── ...
+```
+
+This file will reference your other services and deploy them via their respective `serverless.yaml` files.
+
+```yaml
+# serverless-compose.yaml
+
+services:
+  auth:
+    path: auth
+  accounts:
+    path: accounts
+  posts:
+    path: posts
+```
+
+## Deploy
+
+Now that `serverless-compose.yaml` references all your services, you can deploy them with one command from your root project directory:
+
+```bash
+serverless deploy
+```
+
+This will deploy your services in parallel. But what if you need to use information from one service in another? For example, say you want to reference a user pool ARN from AWS Cognito in another service for HTTP authorization. You would use outputs and parameters!
+
+## Sharing outputs between services
+
+The most useful functionality of the Compose command is passing outputs like ARNs, IDs, or names via [parameters](https://www.serverless.com/framework/docs/guides/parameters). Below is a brief example of passing an ARN, an environment variable, and two resource IDs.
+
+```yaml
+# auth/serverless.yaml
+provider:
+  name: aws
+  ...
+  environment:
+    USER_POOL_NAME: shownxt-${opt:stage, sls:stage}-auth-pool
+
+
+functions: ...
+
+resources:
+  Resources:
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties: ...
+    UserClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties: ...
+
+  Outputs:
+    UserPoolArn:
+      Value:
+        Fn::GetAtt: UserPool.Arn
+    UserPoolName:
+      Value: ${self:provider.environment.USER_POOL_NAME}
+    UserPoolId:
+      Value: !Ref UserPool
+    ClientId:
+      Value: !Ref UserClient
+```
+
+Now let's make sure the `serverless-compose.yaml` file passes these outputs to other services.
+
+```yaml
+# serverless-compose.yaml
+
+services:
+  auth:
+    path: auth
+  accounts:
+    path: accounts
+    params:
+      UserPoolArn: ${auth.UserPoolArn}
+      UserPoolName: ${auth.UserPoolName}
+      UserPoolId: ${auth.UserPoolId}
+      ClientId: ${auth.ClientId}
+  posts:
+    path: posts
+```
+
+Now that the `accounts` service references outputs from the `auth` service, `accounts` will not be deployed until `auth` has finished deploying. Any service that depend on another services output will not be deployed until the parent service is deployed.
+
+Then to reference these outputs in another service, for example `accounts`, we can simply access them as parameters.
+
+```yaml
+# accounts/serverless.yaml
+
+functions:
+  createAccount:
+    handler: src/create.handler
+    events:
+      - cognitoUserPool:
+          pool: ${param:UserPoolName}
+          trigger: PostConfirmation
+          ...
+
+  deleteAccount:
+    handler: src/delete.handler
+    events:
+      - http:
+          path: accounts/
+          method: delete
+          authorizer:
+            name: Authorizer
+            type: COGNITO_USER_POOLS
+            arn: ${param:UserPoolArn}
+```
+
+Now you know how to share build outputs between your microservices with the Serverless Framework!
+
+This is just a high level overview of the compose tool from the Serverless Framework. To see more functionality and documentation, checkout the serverless docs in the reference section.
+
+## Reference
+
+- [https://www.serverless.com/framework/docs/guides/compose](https://www.serverless.com/framework/docs/guides/compose)
+- [https://www.serverless.com/framework/docs/guides/parameters](https://www.serverless.com/framework/docs/guides/parameters)
