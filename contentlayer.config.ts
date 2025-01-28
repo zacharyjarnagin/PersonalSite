@@ -6,12 +6,7 @@ import path from 'path'
 // Remark packages
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import {
-  remarkExtractFrontmatter,
-  remarkCodeTitles,
-  remarkImgToJsx,
-  extractTocHeadings,
-} from 'pliny/mdx-plugins/index.js'
+import { remarkCodeTitles, remarkImgToJsx, extractTocHeadings } from 'pliny/mdx-plugins/index.js'
 // Rehype packages
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
@@ -134,13 +129,7 @@ export default makeSource({
   documentTypes: [Blog, Authors],
   mdx: {
     cwd: process.cwd(),
-    remarkPlugins: [
-      remarkExtractFrontmatter,
-      remarkGfm,
-      remarkCodeTitles,
-      remarkMath,
-      remarkImgToJsx,
-    ],
+    remarkPlugins: [remarkGfm, remarkCodeTitles, remarkMath, remarkImgToJsx],
     rehypePlugins: [
       rehypeSlug,
       rehypeAutolinkHeadings,
